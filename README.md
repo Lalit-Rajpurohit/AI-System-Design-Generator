@@ -115,14 +115,14 @@ graph TD
 - **Java 21** (LTS)
 - **Maven 3.8+**
 - **Node.js 18+** (for frontend)
-- **LLM API Key** (OpenRouter, Groq, Gemini, or HuggingFace)
+- **LLM API Key** (your Personal key or for testing user free key  OpenRouter, Groq, Gemini, or HuggingFace)
 
 ## Quick Start
 
 ### Step 1: Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Lalit-Rajpurohit/AI-System-Design-Generator
 cd aisystemgen
 ```
 
