@@ -1,0 +1,14 @@
+{
+  "title": "Real-time Chat Application",
+  "description": "Design a Slack-like team communication platform supporting 100k concurrent WebSocket connections. Features include channels (public/private), direct messages, thread replies, file sharing (images, documents up to 100MB), emoji reactions, @mentions, search across all messages, and typing indicators. Needs to be mobile-friendly with offline support.",
+  "preferences": {
+    "cloudProvider": "GCP",
+    "architectureStyle": "MICROSERVICES",
+    "expectedMonthlyActiveUsers": 500000,
+    "dataConsistency": "EVENTUAL",
+    "includeTerraform": true,
+    "diagramFormat": "MERMAID",
+    "includeCostEstimate": true
+  },
+  "userId": "demo-user-002"
+}

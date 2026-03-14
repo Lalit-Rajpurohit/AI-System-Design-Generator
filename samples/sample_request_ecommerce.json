@@ -1,0 +1,14 @@
+{
+  "title": "Scalable E-commerce Platform",
+  "description": "Design architecture for a scalable e-commerce platform supporting 1M monthly active users, with secure payments, product search, real-time inventory tracking, and order processing. The platform should support multiple payment gateways (Stripe, PayPal), have a recommendation engine, and handle peak traffic during sale events (10x normal traffic). Include mobile app backend support.",
+  "preferences": {
+    "cloudProvider": "AWS",
+    "architectureStyle": "MICROSERVICES",
+    "expectedMonthlyActiveUsers": 1000000,
+    "dataConsistency": "EVENTUAL",
+    "includeTerraform": true,
+    "diagramFormat": "MERMAID",
+    "includeCostEstimate": true
+  },
+  "userId": "demo-user-001"
+}

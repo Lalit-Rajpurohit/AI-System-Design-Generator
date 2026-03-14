@@ -1,0 +1,163 @@
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "Scalable E-commerce Platform",
+  "generatedAt": "2026-03-14T12:00:00Z",
+  "architectureText": "This e-commerce platform follows a microservices architecture deployed on AWS, designed to handle 1M monthly active users with the ability to scale to 10M during peak events.\n\n**Core Design Principles:**\n1. **Service Independence**: Each microservice owns its data and can be deployed independently\n2. **Event-Driven Communication**: Services communicate asynchronously via Kafka for loose coupling\n3. **CQRS Pattern**: Separate read and write models for high-traffic catalog queries\n4. **Multi-Region**: Active-passive setup with Route53 failover for disaster recovery\n\n**Data Flow:**\n- User requests hit CloudFront CDN for static assets\n- API Gateway routes to appropriate microservices via ALB\n- Services use PostgreSQL RDS for transactional data\n- ElastiCache (Redis) for session management and caching\n- OpenSearch for product search functionality\n- S3 for product images and static content\n\n**Scaling Strategy:**\n- EKS with HPA for automatic pod scaling\n- RDS read replicas for database read scaling\n- ElastiCache cluster mode for cache scaling\n- Kafka partitioning for event stream scaling",
+  "services": [
+    {
+      "name": "API Gateway",
+      "description": "Entry point for all client requests. Handles authentication, rate limiting, and request routing.",
+      "technology": "Kong on EKS",
+      "dependencies": []
+    },
+    {
+      "name": "User Service",
+      "description": "User authentication, profile management, and session handling. Integrates with Cognito for OAuth.",
+      "technology": "Spring Boot",
+      "dependencies": []
+    },
+    {
+      "name": "Product Catalog Service",
+      "description": "Product information management with CQRS. Write model uses PostgreSQL, read model uses OpenSearch.",
+      "technology": "Spring Boot",
+      "dependencies": []
+    },
+    {
+      "name": "Inventory Service",
+      "description": "Real-time inventory tracking with event sourcing. Handles stock reservations and updates.",
+      "technology": "Spring Boot",
+      "dependencies": ["Product Catalog Service"]
+    },
+    {
+      "name": "Cart Service",
+      "description": "Shopping cart management with Redis for fast access. Handles cart expiration and recovery.",
+      "technology": "Node.js",
+      "dependencies": ["Product Catalog Service", "Inventory Service"]
+    },
+    {
+      "name": "Order Service",
+      "description": "Order processing orchestrator using Saga pattern. Coordinates payment, inventory, and shipping.",
+      "technology": "Spring Boot",
+      "dependencies": ["Cart Service", "Inventory Service", "Payment Service"]
+    },
+    {
+      "name": "Payment Service",
+      "description": "Payment processing with Stripe and PayPal integration. Handles refunds and disputes.",
+      "technology": "Spring Boot",
+      "dependencies": []
+    },
+    {
+      "name": "Search Service",
+      "description": "Product search and filtering using OpenSearch. Supports faceted search and autocomplete.",
+      "technology": "Node.js",
+      "dependencies": ["Product Catalog Service"]
+    },
+    {
+      "name": "Recommendation Service",
+      "description": "ML-based product recommendations using SageMaker. Collaborative filtering and content-based.",
+      "technology": "Python/FastAPI",
+      "dependencies": ["Product Catalog Service", "User Service"]
+    },
+    {
+      "name": "Notification Service",
+      "description": "Email, SMS, and push notifications. Handles order updates and marketing campaigns.",
+      "technology": "Node.js",
+      "dependencies": []
+    }
+  ],
+  "techStack": {
+    "frontend": "Next.js with React",
+    "backend": "Spring Boot, Node.js, Python",
+    "database": "PostgreSQL (RDS), DynamoDB",
+    "cache": "Redis (ElastiCache)",
+    "messaging": "Apache Kafka (MSK)",
+    "search": "OpenSearch",
+    "monitoring": "Prometheus, Grafana, X-Ray",
+    "additional": {
+      "cdn": "CloudFront",
+      "storage": "S3",
+      "ml": "SageMaker",
+      "auth": "Cognito"
+    }
+  },
+  "infrastructure": {
+    "cloud": "AWS",
+    "components": [
+      "Route53",
+      "CloudFront",
+      "WAF",
+      "ALB",
+      "EKS",
+      "RDS PostgreSQL",
+      "ElastiCache Redis",
+      "MSK (Kafka)",
+      "OpenSearch",
+      "S3",
+      "SageMaker",
+      "Cognito",
+      "SES",
+      "CloudWatch",
+      "X-Ray"
+    ],
+    "diagramMermaid": "graph TD\n    subgraph \"Client Layer\"\n        Web[Web App]\n        Mobile[Mobile App]\n    end\n\n    subgraph \"Edge Layer\"\n        R53[Route53]\n        CF[CloudFront]\n        WAF[AWS WAF]\n    end\n\n    subgraph \"API Layer\"\n        ALB[Application Load Balancer]\n        Kong[API Gateway - Kong]\n    end\n\n    subgraph \"Service Layer - EKS\"\n        User[User Service]\n        Product[Product Catalog]\n        Inventory[Inventory Service]\n        Cart[Cart Service]\n        Order[Order Service]\n        Payment[Payment Service]\n        Search[Search Service]\n        Recommend[Recommendation]\n        Notify[Notification]\n    end\n\n    subgraph \"Data Layer\"\n        RDS[(RDS PostgreSQL)]\n        Redis[(ElastiCache Redis)]\n        Kafka[MSK Kafka]\n        ES[(OpenSearch)]\n        S3[(S3 Storage)]\n    end\n\n    subgraph \"ML Layer\"\n        SM[SageMaker]\n    end\n\n    Web --> R53\n    Mobile --> R53\n    R53 --> CF\n    CF --> WAF\n    WAF --> ALB\n    ALB --> Kong\n    Kong --> User\n    Kong --> Product\n    Kong --> Cart\n    Kong --> Order\n    Kong --> Search\n\n    User --> RDS\n    User --> Redis\n    Product --> RDS\n    Product --> ES\n    Inventory --> RDS\n    Inventory --> Kafka\n    Cart --> Redis\n    Order --> RDS\n    Order --> Kafka\n    Payment --> RDS\n    Search --> ES\n    Recommend --> SM\n    Notify --> Kafka\n\n    Product --> S3",
+    "scalingStrategy": {
+      "type": "horizontal",
+      "description": "Multi-tier auto-scaling with EKS HPA for services, RDS read replicas for database, and ElastiCache cluster mode for caching. Kafka partitions scale with consumer groups.",
+      "keyMetrics": [
+        "cpu_utilization",
+        "memory_utilization",
+        "request_count",
+        "response_latency_p99",
+        "kafka_lag"
+      ],
+      "thresholds": {
+        "cpu_scale_up": "70%",
+        "cpu_scale_down": "30%",
+        "request_count": "1000/min per pod",
+        "latency_p99": "500ms"
+      }
+    },
+    "securityRecommendations": [
+      {
+        "category": "Network",
+        "recommendation": "Deploy services in private subnets with NAT Gateway for outbound traffic. Use VPC endpoints for AWS services.",
+        "priority": "HIGH"
+      },
+      {
+        "category": "Authentication",
+        "recommendation": "Use Cognito with MFA for user authentication. Implement JWT with short expiry (15min) and refresh tokens.",
+        "priority": "HIGH"
+      },
+      {
+        "category": "Data",
+        "recommendation": "Enable encryption at rest for RDS, ElastiCache, and S3. Use KMS managed keys.",
+        "priority": "HIGH"
+      },
+      {
+        "category": "API",
+        "recommendation": "Implement rate limiting at API Gateway level. Use WAF rules to block common attack patterns.",
+        "priority": "HIGH"
+      },
+      {
+        "category": "Payments",
+        "recommendation": "PCI-DSS compliance: Never store card data. Use Stripe/PayPal tokenization. Audit all payment transactions.",
+        "priority": "CRITICAL"
+      },
+      {
+        "category": "Monitoring",
+        "recommendation": "Enable CloudTrail for API audit logging. Set up alerts for suspicious activities and failed authentications.",
+        "priority": "MEDIUM"
+      }
+    ]
+  },
+  "terraformSnippet": "# EKS Cluster\nmodule \"eks\" {\n  source          = \"terraform-aws-modules/eks/aws\"\n  version         = \"~> 19.0\"\n  cluster_name    = \"ecommerce-cluster\"\n  cluster_version = \"1.28\"\n  \n  vpc_id     = module.vpc.vpc_id\n  subnet_ids = module.vpc.private_subnets\n  \n  eks_managed_node_groups = {\n    general = {\n      instance_types = [\"m5.large\"]\n      min_size       = 3\n      max_size       = 10\n      desired_size   = 5\n    }\n  }\n}\n\n# RDS PostgreSQL\nmodule \"rds\" {\n  source  = \"terraform-aws-modules/rds/aws\"\n  version = \"~> 6.0\"\n  \n  identifier = \"ecommerce-db\"\n  engine     = \"postgres\"\n  engine_version = \"15.4\"\n  instance_class = \"db.r5.xlarge\"\n  \n  allocated_storage     = 100\n  max_allocated_storage = 500\n  \n  multi_az               = true\n  db_subnet_group_name   = module.vpc.database_subnet_group\n  vpc_security_group_ids = [module.security_group.security_group_id]\n  \n  backup_retention_period = 7\n  deletion_protection     = true\n}\n\n# ElastiCache Redis\nresource \"aws_elasticache_replication_group\" \"redis\" {\n  replication_group_id       = \"ecommerce-cache\"\n  description                = \"Redis cluster for caching\"\n  node_type                  = \"cache.r5.large\"\n  num_cache_clusters         = 3\n  automatic_failover_enabled = true\n  \n  at_rest_encryption_enabled = true\n  transit_encryption_enabled = true\n  \n  subnet_group_name  = aws_elasticache_subnet_group.redis.name\n  security_group_ids = [module.security_group.security_group_id]\n}\n\n# MSK (Kafka)\nresource \"aws_msk_cluster\" \"kafka\" {\n  cluster_name           = \"ecommerce-events\"\n  kafka_version          = \"3.5.1\"\n  number_of_broker_nodes = 3\n  \n  broker_node_group_info {\n    instance_type   = \"kafka.m5.large\"\n    client_subnets  = module.vpc.private_subnets\n    security_groups = [module.security_group.security_group_id]\n    \n    storage_info {\n      ebs_storage_info {\n        volume_size = 100\n      }\n    }\n  }\n  \n  encryption_info {\n    encryption_in_transit {\n      client_broker = \"TLS\"\n      in_cluster    = true\n    }\n  }\n}",
+  "costEstimate": {
+    "monthly": "USD 8,500 - 12,000",
+    "yearly": "USD 102,000 - 144,000",
+    "breakdown": "Compute (EKS): 35% (~$3,500)\nDatabase (RDS): 25% (~$2,500)\nCache (ElastiCache): 10% (~$1,000)\nMessaging (MSK): 10% (~$1,000)\nSearch (OpenSearch): 8% (~$800)\nNetwork & CDN: 7% (~$700)\nStorage & Other: 5% (~$500)",
+    "assumptions": "Based on 1M MAU, 50GB database, 20GB cache, moderate Kafka throughput. Costs will increase 2-3x during peak events. Reserved instances can reduce costs by 30-40%."
+  },
+  "llmProvider": "openrouter",
+  "tokensUsed": 3500,
+  "status": "COMPLETED"
+}

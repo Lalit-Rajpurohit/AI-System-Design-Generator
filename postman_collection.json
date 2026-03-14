@@ -1,0 +1,275 @@
+{
+  "info": {
+    "name": "AI System Designer API",
+    "description": "API collection for AI System Designer - Generate system architecture designs using LLM",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "adminKey",
+      "value": "your-admin-key",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Public Endpoints",
+      "item": [
+        {
+          "name": "Generate Design",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Scalable E-commerce Platform\",\n  \"description\": \"Design architecture for a scalable e-commerce platform supporting 1M monthly active users, with secure payments, search, and real-time order processing.\",\n  \"preferences\": {\n    \"cloudProvider\": \"AWS\",\n    \"architectureStyle\": \"MICROSERVICES\",\n    \"expectedMonthlyActiveUsers\": 1000000,\n    \"dataConsistency\": \"EVENTUAL\",\n    \"includeTerraform\": true,\n    \"diagramFormat\": \"MERMAID\",\n    \"includeCostEstimate\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/generate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Generate Preview (No Persist)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Quick Preview\",\n  \"description\": \"Simple URL shortener service with analytics\",\n  \"preferences\": {\n    \"cloudProvider\": \"AWS\",\n    \"architectureStyle\": \"SERVERLESS\",\n    \"includeTerraform\": false\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/generate-preview",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "generate-preview"]
+            }
+          }
+        },
+        {
+          "name": "Get Design by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/designs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "designs", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Designs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/designs?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "designs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Designs (Filter by Status)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/designs?status=COMPLETED",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "designs"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Designs by Title",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/designs?search=ecommerce",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "designs"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "ecommerce"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Endpoints",
+      "item": [
+        {
+          "name": "Regenerate Design",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/designs/:id/regenerate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "designs", ":id", "regenerate"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Design",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/designs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "designs", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Purge Old Designs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/purge?olderThanDays=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "purge"],
+              "query": [
+                {
+                  "key": "olderThanDays",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reset Rate Limits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/rate-limit/reset",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "rate-limit", "reset"]
+            }
+          }
+        },
+        {
+          "name": "Admin Health Check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health & Monitoring",
+      "item": [
+        {
+          "name": "Actuator Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        },
+        {
+          "name": "Actuator Info",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/actuator/info",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "info"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
